@@ -1,8 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SKG Client - Pet Clinic Management System
+
+## Project Overview
+
+This is a comprehensive frontend application for the SKG Pet Clinic Management System, built with **Next.js 16**. It provides a robust interface for managing various clinic operations including appointments, inventory, billing, pharmacy, and patient records.
+
+## Technology Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **UI Components**: [Shadcn UI](https://ui.shadcn.com/)
+- **State Management**: 
+  - [Redux Toolkit](https://redux-toolkit.js.org/)
+  - [Zustand](https://zustand-demo.pmnd.rs/)
+- **Data Fetching**: [TanStack Query (React Query)](https://tanstack.com/query/latest)
+- **Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+
+## Features
+
+The application is structured into several core modules:
+
+- **Authentication**: Secure login/logout functionality.
+- **Dashboard**: Central hub for clinic metrics and quick actions.
+- **Appointments**: Scheduling and managing doctor appointments.
+- **Inventory**: Management of medical supplies and products.
+- **Billing**: Invoicing and payment processing.
+- **Medical**: Patient records and medical history.
+- **Doctor Management**: Tools for doctors to manage their schedule and patients.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- **Node.js**: Ensure you have Node.js installed (LTS recommended).
+- **Package Manager**: npm, yarn, pnpm, or bun.
+
+### Environment Variables
+
+Create a `.env` file in the root directory. You can use the example below:
+
+```env
+NEXT_PUBLIC_BASE_URL=http://localhost:8000 # Replace with your backend API URL
+```
+
+### Installation
+
+1.  Clone the repository:
+    ```bash
+    git clone <repository-url>
+    cd client
+    ```
+
+2.  Install dependencies:
+    ```bash
+    npm install
+    # or
+    yarn install
+    # or
+    pnpm install
+    ```
+
+### Running the Application
+
+Run the development server:
 
 ```bash
 npm run dev
@@ -10,27 +71,39 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+client/
+├── app/                  # Next.js App Router pages and layouts
+│   ├── (auth)/           # Authentication routes
+│   ├── (dashboard)/      # Protected dashboard routes
+│   ├── Redux/            # Redux store and slices
+│   └── api/              # API utilities
+├── components/           # Reusable UI components
+│   ├── ui/               # Shadcn UI primitives
+│   ├── forms/            # Form components
+│   └── ...               # Feature-specific components
+├── lib/                  # Utility functions and configurations
+├── public/               # Static assets
+└── ...
+```
+
+## Scripts
+
+- `npm run dev`: Runs the app in development mode.
+- `npm run build`: Builds the app for production.
+- `npm start`: Starts the production build.
+- `npm run lint`: Runs ESLint to check for code quality issues.
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about the technologies used in this project:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Shadcn UI Documentation](https://ui.shadcn.com/docs)
