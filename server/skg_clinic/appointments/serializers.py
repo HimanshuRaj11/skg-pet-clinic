@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Appointment , MedicalRecord
+from .models import Appointment , MedicalRecord , Prescription
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -14,3 +14,8 @@ class MedicalRecordSerializer(serializers.ModelSerializer):
         model = MedicalRecord
         fields = "__all__"
         read_only_fields = ("id", "created_at", "updated_at", "created_by")
+
+class PrescriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prescription
+        fields = "__all__"

@@ -72,3 +72,16 @@ class MedicalRecord(models.Model):
 
     def __str__(self):
         return f"MedicalRecord for {self.appointment.pet.pet_name}"
+    
+class Prescription(models.Model):
+    medical_record = models.ForeignKey(
+        MedicalRecord,
+        on_delete=models.CASCADE,
+        related_name="prescriptions",
+    )
+    medicine_name = models.CharField(max_length=150)
+    dosage = models.CharField(max_length=100)
+    frequency = models.CharField(max_length=100)
+    duration = models.CharField(max_length=100)
+    instructions = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)

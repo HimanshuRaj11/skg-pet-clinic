@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
-from .models import Appointment ,MedicalRecord
-from .serializers import AppointmentSerializer , MedicalRecordSerializer
+from .models import Appointment ,MedicalRecord, Prescription
+from .serializers import AppointmentSerializer , MedicalRecordSerializer, PrescriptionSerializer
 from users.permissions import IsStaff
 from .filters import AppointmentFilter
 
@@ -24,3 +24,8 @@ class MedicalRecordViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+class PrescriptionViewSet(ModelViewSet):
+    queryset = Prescription.objects.all()
+    serializer_class = PrescriptionSerializer
+    permission_classes = [IsStaff]

@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     "products",
     "invoices",
     "payments",
-    "appointments"
+    "appointments",
+    "billing"
 ]
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
