@@ -42,8 +42,16 @@ export function LoginForm() {
             setIsLoading(true)
             console.log(values);
 
-            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/login/`, values)
+            // const { data } = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/login/`, values)
+            const { data } = await axios.post("http://localhost:8000/api/auth/login/", values)
             console.log(data);
+
+            // Store the JWT tokens for future API calls
+            localStorage.setItem('access_token', data.access);
+            localStorage.setItem('refresh_token', data.refresh);
+
+            // Set the default Authorization header for future axios calls
+            axios.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
 
             setIsLoading(false)
             router.push("/dashboard")

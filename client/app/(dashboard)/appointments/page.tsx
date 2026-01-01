@@ -13,7 +13,7 @@ import { AppointmentCalendar } from "@/components/appointments/appointment-calen
 export default function AppointmentsPage() {
     const { data, isLoading, error } = useQuery<Appointment[]>({
         queryKey: ["appointments"],
-        queryFn: () => fetcher("/api/demo/appointments"),
+        queryFn: () => fetcher("http://localhost:8000/api/appointments"),
     })
 
     if (isLoading) return <div>Loading...</div>
