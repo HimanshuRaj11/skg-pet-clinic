@@ -9,6 +9,7 @@ import { Plus } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AppointmentCalendar } from "@/components/appointments/appointment-calendar"
+import { useEffect } from "react"
 
 export default function AppointmentsPage() {
     const { data, isLoading, error } = useQuery<Appointment[]>({
@@ -16,8 +17,18 @@ export default function AppointmentsPage() {
         queryFn: () => fetcher("http://localhost:8000/api/appointments"),
     })
 
+    const fetchAppointments = async () => {
+        const response = await fetch("http://localhost:8000/api/appointments")
+        console.log(response);
+
+        return response.json()
+    }
+    useEffect(() => {
+        fetchAppointments()
+    }, [])
+
     if (isLoading) return <div>Loading...</div>
-    if (error) return <div>Error loading appointments</div>
+
 
     return (
         <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">

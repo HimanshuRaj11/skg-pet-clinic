@@ -19,6 +19,8 @@ import { useDispatch, useSelector, } from "react-redux";
 
 export function Header() {
     const { User } = useSelector((state: any) => state.User);
+    console.log(User);
+
     const router = useRouter();
     const dispatch = useDispatch();
 

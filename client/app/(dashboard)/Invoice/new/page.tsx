@@ -53,9 +53,9 @@ const SERVICE_ITEMS = [
 ]
 
 const MOCK_PETS = [
-    { id: "1", name: "Buddy", species: "Dog", breed: "Golden Retriever" },
-    { id: "2", name: "Luna", species: "Cat", breed: "Siamese" },
-    { id: "3", name: "Max", species: "Dog", breed: "German Shepherd" },
+    { id: "1", name: "Buddy", species: "Dog", breed: "Golden Retriever", microchip: "981098109821" },
+    { id: "2", name: "Luna", species: "Cat", breed: "Siamese", microchip: "981098109822" },
+    { id: "3", name: "Max", species: "Dog", breed: "German Shepherd", microchip: "981098109823" },
 ]
 
 const MOCK_OWNERS = {
@@ -198,6 +198,8 @@ export default function EnhancedInvoicePage() {
         }
 
         try {
+            console.log(invoiceData);
+
             const response = await mockApiSaveInvoice(invoiceData)
             alert(`Invoice saved successfully! Invoice ID: ${response.invoiceId}`)
         } catch (error) {
@@ -213,6 +215,7 @@ export default function EnhancedInvoicePage() {
 
         const printWindow = window.open('', '', 'width=800,height=600')
         if (!printWindow) return
+        handleSave()
 
         printWindow.document.write(`
             <html>
@@ -379,7 +382,7 @@ export default function EnhancedInvoicePage() {
                                                     >
                                                         <div className="flex justify-between w-full">
                                                             <span>{service.name}</span>
-                                                            <span className="text-muted-foreground">${service.price}</span>
+                                                            <span className="text-muted-foreground">₹{service.price}</span>
                                                         </div>
                                                     </CommandItem>
                                                 ))}
@@ -468,11 +471,11 @@ export default function EnhancedInvoicePage() {
                                                             }
                                                         />
                                                     ) : (
-                                                        <span>${item.unitPrice.toFixed(2)}</span>
+                                                        <span>₹{item.unitPrice.toFixed(2)}</span>
                                                     )}
                                                 </TableCell>
                                                 <TableCell className="font-medium">
-                                                    ${(item.quantity * item.unitPrice).toFixed(2)}
+                                                    ₹{(item.quantity * item.unitPrice).toFixed(2)}
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex gap-1">
@@ -544,16 +547,16 @@ export default function EnhancedInvoicePage() {
                             <div className="space-y-2">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-muted-foreground">Subtotal</span>
-                                    <span>${calculateSubtotal().toFixed(2)}</span>
+                                    <span>₹{calculateSubtotal().toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-muted-foreground">Tax (10%)</span>
-                                    <span>${calculateTax().toFixed(2)}</span>
+                                    <span>₹{calculateTax().toFixed(2)}</span>
                                 </div>
                                 <Separator />
                                 <div className="flex justify-between font-bold text-xl">
                                     <span>Total Due</span>
-                                    <span>${calculateTotal().toFixed(2)}</span>
+                                    <span>₹{calculateTotal().toFixed(2)}</span>
                                 </div>
                             </div>
                         </CardContent>
@@ -619,15 +622,15 @@ export default function EnhancedInvoicePage() {
                 <div className="totals">
                     <div>
                         <span>Subtotal:</span>
-                        <span>${calculateSubtotal().toFixed(2)}</span>
+                        <span>₹{calculateSubtotal().toFixed(2)}</span>
                     </div>
                     <div>
                         <span>Tax (10%):</span>
-                        <span>${calculateTax().toFixed(2)}</span>
+                        <span>₹{calculateTax().toFixed(2)}</span>
                     </div>
                     <div className="total-row">
                         <span>Total Due:</span>
-                        <span>${calculateTotal().toFixed(2)}</span>
+                        <span>₹{calculateTotal().toFixed(2)}</span>
                     </div>
                 </div>
 

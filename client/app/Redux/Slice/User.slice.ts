@@ -1,33 +1,38 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from 'axios';
 import { redirect } from "next/navigation";
-const base_url = process.env.NEXT_PUBLIC_BASE_URL
+const base_url = process.env.NEXT_PUBLIC_SERVER_URL
 
 interface User {
     name: string;
     email: string;
-    // Add other user properties as needed
+    role: string;
 }
 
 export const LogoutUser = createAsyncThunk("logoutUser", async () => {
     try {
-        const res = await axios.get(`${base_url}/api/v1/logout`, { withCredentials: true })
+        const res = await axios.get(`${base_url}/api/auth/logout/`, { withCredentials: true })
         return res.data
+
     } catch (error) {
         return error
     }
 })
 export const FetchUser = createAsyncThunk("fetchUser", async () => {
     try {
-        const res = {
-            data: {
-                user: {
-                    name: "Dr. Smith",
-                    email: "skg@test.com",
-                }
-            }
+        // Retrieve the token from cookies
+        const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+        if (!token) {
+            throw new Error("No access token found");
         }
-        // const res = await axios.get(`${base_url}/api/v1`, { withCredentials: true })
+
+        const res = await axios.get(`${base_url}/api/auth/profile/`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        console.log(res.data);
+
         return res.data
     } catch (error) {
         throw error;
@@ -49,7 +54,7 @@ const UserSlice = createSlice({
             })
             .addCase(FetchUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.User = action.payload.user;
+                state.User = action.payload;
                 state.error = false
             })
             .addCase(FetchUser.rejected, (state) => {

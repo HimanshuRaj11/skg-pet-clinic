@@ -31,3 +31,11 @@ class StockBatch(models.Model):
 
     class Meta:
         unique_together = ("item", "batch_number")
+
+class StockLedger(models.Model):
+    item = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)
+    change = models.IntegerField()  # + or -
+    reason = models.CharField(max_length=255)
+    reference = models.CharField(max_length=255, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
