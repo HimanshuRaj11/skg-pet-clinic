@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "invoices",
     "payments",
     "appointments",
+    "inventory",
     "billing"
 ]
 REST_FRAMEWORK = {
