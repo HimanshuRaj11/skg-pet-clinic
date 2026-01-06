@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 export type Pet = {
     id: string
     ownerId: string
-    name: string
+    pet_name: string
     species: string
     breed: string
     dob: string
@@ -47,9 +47,9 @@ export const columns: ColumnDef<Pet>[] = [
                 <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                         <AvatarImage src={row.original.photoUrl} />
-                        <AvatarFallback>{row.original.name[0]}</AvatarFallback>
+                        <AvatarFallback>{row.original.pet_name[0]}</AvatarFallback>
                     </Avatar>
-                    <span>{row.original.name}</span>
+                    <span>{row.original.pet_name}</span>
                 </div>
             )
         }
