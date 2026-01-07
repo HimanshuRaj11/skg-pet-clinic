@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
+import moment from "moment"
 
 export type Appointment = {
     id: string
@@ -21,27 +22,48 @@ export type Appointment = {
     datetime: string
     status: string
     type: string
+    appointment_date: string
+    appointment_time: string
 }
 
 export const columns: ColumnDef<Appointment>[] = [
     {
-        accessorKey: "datetime",
+        accessorKey: "appointment_date",
         header: ({ column }) => {
             return (
                 <Button
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    Date & Time
+                    Date
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             )
         },
+        cell: ({ row }) => {
+            const formatted = moment.utc(row.original.appointment_date).format('DD-MMM-YYYY');
+            return <span>{formatted}</span>
+        }
     },
     {
-        accessorKey: "type",
-        header: "Type",
+        accessorKey: "appointment_time",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Time
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const formatted = moment(row.original.appointment_time, 'HH:mm:ss').format('hh:mm A');
+            return <span>{formatted}</span>
+        }
     },
+
     {
         accessorKey: "status",
         header: "Status",

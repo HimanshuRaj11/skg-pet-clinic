@@ -1,15 +1,16 @@
 "use client"
 
-import { Pet, columns } from "./columns"
+import { columns } from "./columns"
 import { DataTable } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 import axios from "axios"
 import { useEffect, useState } from "react"
+import { PetFormData } from "@/components/forms/PetClinicForm"
 
 export default function PetsPage() {
-    const [pets, setPets] = useState<Pet[]>([]);
+    const [pets, setPets] = useState<PetFormData[]>([]);
 
     const fetchPets = async () => {
         const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
@@ -23,8 +24,6 @@ export default function PetsPage() {
                 }
             });
             setPets(data);
-            console.log('Form submitted:', data);
-            alert('Pet registration submitted successfully!');
 
         } catch (error) {
             console.log(error);

@@ -3,14 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { PawPrint } from 'lucide-react';
 import axios from 'axios';
 
-interface PetFormData {
+export interface PetFormData {
+    id?: string;
     pet_name: string;
     species: string;
     gender: string;
-    petBreed: string;
-    petAgeYears: string;
-    petAgeMonths: string;
-    petAgeDays: string;
+    breed: string;
     date_of_birth: string;
     microchipNumber: string;
     vaccinationId: string;
@@ -21,17 +19,15 @@ interface PetFormData {
     owner_phone: string;
     owner_address: string;
     medical_notes: string;
+    created_at?: string;
 }
 
-export default function PetClinicForm({ initialData }: { initialData: PetFormData }) {
+export default function PetClinicForm() {
     const [formData, setFormData] = useState<PetFormData>({
         pet_name: '',
         species: '',
         gender: '',
-        petBreed: '',
-        petAgeYears: '',
-        petAgeMonths: '',
-        petAgeDays: '',
+        breed: '',
         date_of_birth: '',
         microchipNumber: '',
         vaccinationId: '',
@@ -158,8 +154,8 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                 </label>
                                 <input
                                     type="text"
-                                    name="petBreed"
-                                    value={formData.petBreed}
+                                    name="breed"
+                                    value={formData.breed}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
                                 />
@@ -178,42 +174,7 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                                    Age
-                                </label>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <input
-                                        type="number"
-                                        name="petAgeYears"
-                                        value={formData.petAgeYears}
-                                        onChange={handleChange}
-                                        placeholder="Years"
-                                        min="0"
-                                        className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
-                                    />
-                                    <input
-                                        type="number"
-                                        name="petAgeMonths"
-                                        value={formData.petAgeMonths}
-                                        onChange={handleChange}
-                                        placeholder="Months"
-                                        min="0"
-                                        max="11"
-                                        className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
-                                    />
-                                    <input
-                                        type="number"
-                                        name="petAgeDays"
-                                        value={formData.petAgeDays}
-                                        onChange={handleChange}
-                                        placeholder="Days"
-                                        min="0"
-                                        max="30"
-                                        className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
-                                    />
-                                </div>
-                            </div>
+
 
                             <div>
                                 <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">

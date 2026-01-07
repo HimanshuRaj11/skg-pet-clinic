@@ -9,25 +9,41 @@ import { Plus } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AppointmentCalendar } from "@/components/appointments/appointment-calendar"
-import { useEffect } from "react"
+import React, { useEffect } from "react"
+import axios from "axios"
 
 export default function AppointmentsPage() {
-    const { data, isLoading, error } = useQuery<Appointment[]>({
-        queryKey: ["appointments"],
-        queryFn: () => fetcher("http://localhost:8000/api/appointments"),
-    })
 
+    const [loading, setLoading] = React.useState(true);
+    const [data, setData] = React.useState<Appointment[] | null>(null);
+    console.log(data, "appointments data");
     const fetchAppointments = async () => {
-        const response = await fetch("http://localhost:8000/api/appointments")
-        console.log(response);
+        const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+        if (!token) {
+            throw new Error("No access token found");
+        }
+        try {
+            setLoading(true);
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/appointments/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setData(data);
+        } catch (error) {
 
-        return response.json()
+        } finally {
+            setLoading(false);
+        }
     }
+
     useEffect(() => {
-        fetchAppointments()
+        if (!data) {
+            fetchAppointments();
+        }
     }, [])
 
-    if (isLoading) return <div>Loading...</div>
+    if (loading) return <div>Loading...</div>
 
 
     return (
@@ -47,19 +63,7 @@ export default function AppointmentsPage() {
                     </Link>
                 </div>
             </div>
-
-            <Tabs defaultValue="calendar" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="calendar">Calendar</TabsTrigger>
-                    <TabsTrigger value="list">List View</TabsTrigger>
-                </TabsList>
-                <TabsContent value="calendar" className="space-y-4">
-                    <AppointmentCalendar appointments={data || []} />
-                </TabsContent>
-                <TabsContent value="list" className="space-y-4">
-                    <DataTable data={data || []} columns={columns} searchKey="type" />
-                </TabsContent>
-            </Tabs>
+            <DataTable data={data || []} columns={columns} searchKey="type" />
         </div>
     )
 }

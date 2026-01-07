@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Plus, Trash2, Save, Printer, Search, Edit2, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -37,6 +37,9 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
+import axios from "axios"
+import { Pet } from "../../pets/columns"
+import { PetFormData } from "@/components/forms/PetClinicForm"
 
 // Mock pre-fetched service items
 const SERVICE_ITEMS = [
@@ -52,18 +55,6 @@ const SERVICE_ITEMS = [
     { id: "10", name: "Emergency Visit", price: 100 },
 ]
 
-const MOCK_PETS = [
-    { id: "1", name: "Buddy", species: "Dog", breed: "Golden Retriever", microchip: "981098109821" },
-    { id: "2", name: "Luna", species: "Cat", breed: "Siamese", microchip: "981098109822" },
-    { id: "3", name: "Max", species: "Dog", breed: "German Shepherd", microchip: "981098109823" },
-]
-
-const MOCK_OWNERS = {
-    "1": { name: "John Smith", address: "123 Main St, Springfield", email: "john@email.com", phone: "(555) 123-4567" },
-    "2": { name: "Sarah Johnson", address: "456 Oak Ave, Springfield", email: "sarah@email.com", phone: "(555) 234-5678" },
-    "3": { name: "Mike Wilson", address: "789 Pine Rd, Springfield", email: "mike@email.com", phone: "(555) 345-6789" },
-}
-
 interface InvoiceItem {
     id: string
     serviceId: string | null
@@ -74,20 +65,11 @@ interface InvoiceItem {
     isEditing: boolean
 }
 
-// Mock API functions
-const mockApiSaveInvoice = async (data: any) => {
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    console.log("API Call - Save Invoice:", data)
-    return { success: true, invoiceId: "INV-" + Math.random().toString(36).substr(2, 9).toUpperCase() }
-}
-
-const mockApiFetchServices = async () => {
-    await new Promise(resolve => setTimeout(resolve, 500))
-    console.log("API Call - Fetch Services")
-    return SERVICE_ITEMS
-}
 
 export default function EnhancedInvoicePage() {
+    const [pets, setPets] = useState<PetFormData[]>([]);
+
+
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [selectedPetId, setSelectedPetId] = useState<string>("")
     const [notes, setNotes] = useState<string>("")
@@ -97,9 +79,30 @@ export default function EnhancedInvoicePage() {
     const [isSaving, setIsSaving] = useState(false)
     const printRef = useRef<HTMLDivElement>(null)
 
-    const selectedPet = MOCK_PETS.find((p) => p.id === selectedPetId)
-    const selectedOwner = selectedPet ? MOCK_OWNERS[selectedPetId as keyof typeof MOCK_OWNERS] : null
+    const selectedPet = pets.find((p) => p.id === selectedPetId)
+    const fetchPets = async () => {
+        const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+        if (!token) {
+            throw new Error("No access token found");
+        }
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/customers/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setPets(data);
 
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+    useEffect(() => {
+        if (!pets.length) {
+            fetchPets();
+        }
+    }, []);
     const handleAddServiceItem = (service: typeof SERVICE_ITEMS[0]) => {
         const newItem: InvoiceItem = {
             id: Math.random().toString(36).substr(2, 9),
@@ -168,7 +171,7 @@ export default function EnhancedInvoicePage() {
     }
 
     const handleSave = async () => {
-        if (!selectedPet || !selectedOwner) {
+        if (!selectedPet) {
             alert("Please select a pet first")
             return
         }
@@ -183,7 +186,6 @@ export default function EnhancedInvoicePage() {
             date: date?.toISOString(),
             petId: selectedPetId,
             pet: selectedPet,
-            owner: selectedOwner,
             items: items.map(item => ({
                 serviceId: item.serviceId,
                 description: item.description,
@@ -200,8 +202,6 @@ export default function EnhancedInvoicePage() {
         try {
             console.log(invoiceData);
 
-            const response = await mockApiSaveInvoice(invoiceData)
-            alert(`Invoice saved successfully! Invoice ID: ${response.invoiceId}`)
         } catch (error) {
             alert("Error saving invoice: " + error)
         } finally {
@@ -282,30 +282,30 @@ export default function EnhancedInvoicePage() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Bill To</CardTitle>
-                            <CardDescription>Select a pet to fetch owner details</CardDescription>
+                            <CardDescription>Select a patient to fetch owner details</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                <Label>Select Pet</Label>
+                                <Label>Select patient</Label>
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Button variant="outline" className="w-full justify-start">
                                             <Search className="mr-2 h-4 w-4" />
-                                            {selectedPet ? selectedPet.name : "Search pet..."}
+                                            {selectedPet ? selectedPet.pet_name : "Search pet..."}
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-full p-0" align="start">
                                         <Command>
                                             <CommandInput placeholder="Search pet..." />
-                                            <CommandEmpty>No pet found.</CommandEmpty>
+                                            <CommandEmpty>No patient found.</CommandEmpty>
                                             <CommandGroup>
-                                                {MOCK_PETS.map((pet) => (
+                                                {pets?.map((pet: PetFormData) => (
                                                     <CommandItem
                                                         key={pet.id}
-                                                        onSelect={() => setSelectedPetId(pet.id)}
+                                                        onSelect={() => setSelectedPetId(pet.id!)}
                                                     >
                                                         <div>
-                                                            <div className="font-medium">{pet.name}</div>
+                                                            <div className="font-medium">{pet.pet_name}</div>
                                                             <div className="text-sm text-muted-foreground">
                                                                 {pet.species} - {pet.breed}
                                                             </div>
@@ -318,23 +318,23 @@ export default function EnhancedInvoicePage() {
                                 </Popover>
                             </div>
 
-                            {selectedPet && selectedOwner && (
+                            {selectedPet && (
                                 <div className="rounded-md border p-4 bg-muted/50">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <h4 className="font-semibold text-sm text-muted-foreground mb-2">
                                                 Owner Details
                                             </h4>
-                                            <p className="font-medium">{selectedOwner.name}</p>
-                                            <p className="text-sm">{selectedOwner.address}</p>
-                                            <p className="text-sm">{selectedOwner.email}</p>
-                                            <p className="text-sm">{selectedOwner.phone}</p>
+                                            <p className="font-medium">{selectedPet.owner_name}</p>
+                                            <p className="text-sm">{selectedPet.owner_address}</p>
+                                            <p className="text-sm">{selectedPet.owner_email}</p>
+                                            <p className="text-sm">{selectedPet.owner_phone}</p>
                                         </div>
                                         <div>
                                             <h4 className="font-semibold text-sm text-muted-foreground mb-2">
-                                                Pet Details
+                                                patient Details
                                             </h4>
-                                            <p className="font-medium">{selectedPet.name}</p>
+                                            <p className="font-medium">{selectedPet.pet_name}</p>
                                             <p className="text-sm">
                                                 {selectedPet.species} - {selectedPet.breed}
                                             </p>
@@ -577,12 +577,12 @@ export default function EnhancedInvoicePage() {
                 <div className="invoice-info">
                     <div className="info-section">
                         <h3>BILL TO:</h3>
-                        {selectedOwner && (
+                        {selectedPet && (
                             <>
-                                <p><strong>{selectedOwner.name}</strong></p>
-                                <p>{selectedOwner.address}</p>
-                                <p>{selectedOwner.email}</p>
-                                <p>{selectedOwner.phone}</p>
+                                <p><strong>{selectedPet.owner_name}</strong></p>
+                                <p>{selectedPet.owner_address}</p>
+                                <p>{selectedPet.owner_email}</p>
+                                <p>{selectedPet.owner_phone}</p>
                             </>
                         )}
                     </div>
@@ -590,7 +590,7 @@ export default function EnhancedInvoicePage() {
                         <h3>PET DETAILS:</h3>
                         {selectedPet && (
                             <>
-                                <p><strong>{selectedPet.name}</strong></p>
+                                <p><strong>{selectedPet.pet_name}</strong></p>
                                 <p>{selectedPet.species}</p>
                                 <p>{selectedPet.breed}</p>
                             </>

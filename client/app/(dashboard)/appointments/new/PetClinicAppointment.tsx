@@ -87,18 +87,8 @@ const PetClinicAppointment: React.FC = () => {
             throw new Error("No access token found");
         }
 
-
         try {
-            // API call to book appointment
-            console.log(formData);
-
-            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/appointments/`, {
-                appointment_date: "2026-01-06",
-                appointment_time: "20:25:23.245Z",
-                reason: "string",
-                status: "SCHEDULED",
-                pet: "3"
-            }, {
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/appointments/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -118,7 +108,7 @@ const PetClinicAppointment: React.FC = () => {
                 status: "SCHEDULED",
             });
         } catch (err) {
-            console.log(error);
+            console.log(error, "erorjhbjhghgf");
 
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
@@ -261,7 +251,7 @@ const PetClinicAppointment: React.FC = () => {
                                         const time = e.target.value;
                                         setFormData({
                                             ...formData,
-                                            appointment_time: time ? `${time}:00.000000` : ''
+                                            appointment_time: time
                                         });
                                     }}
                                     required

@@ -19,15 +19,19 @@ import { useDispatch, useSelector, } from "react-redux";
 
 export function Header() {
     const { User } = useSelector((state: any) => state.User);
-    console.log(User);
-
     const router = useRouter();
+
+    // useEffect(() => {
+    //     if (!User) {
+    //         router.push("/");
+    //     }
+    // }, [User, router]);
+
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(FetchUser() as any)
     }, []);
-
     return (
         <div className="border-b p-4 flex items-center justify-between h-16 bg-background">
             <MobileSidebar />
@@ -43,7 +47,7 @@ export function Header() {
                                         <AvatarImage src={User?.image} alt={User.name} />
                                     ) : (
                                         <AvatarFallback>
-                                            {User.name.split(" ").map((n: any) => n[0]).slice(0, 2).join("")}
+                                            {User.name.split(" ").map((n: any) => n[0]).join("").toUpperCase()}
                                         </AvatarFallback>
                                     )}
                                 </Avatar>
