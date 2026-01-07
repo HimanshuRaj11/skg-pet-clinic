@@ -1,21 +1,40 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
-import { fetcher } from "@/lib/api"
-import { Pet, columns } from "./columns"
+import { columns } from "./columns"
 import { DataTable } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
+import axios from "axios"
+import { useEffect, useState } from "react"
+import { PetFormData } from "@/components/forms/PetClinicForm"
 
 export default function PetsPage() {
-    const { data, isLoading, error } = useQuery<Pet[]>({
-        queryKey: ["pets"],
-        queryFn: () => fetcher("/api/demo/pets"),
-    })
+    const [pets, setPets] = useState<PetFormData[]>([]);
 
-    if (isLoading) return <div>Loading...</div>
-    if (error) return <div>Error loading pets</div>
+    const fetchPets = async () => {
+        const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+        if (!token) {
+            throw new Error("No access token found");
+        }
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/customers/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setPets(data);
+
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+    useEffect(() => {
+        fetchPets();
+    }, []);
+
+
 
     return (
         <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
@@ -34,7 +53,7 @@ export default function PetsPage() {
                     </Link>
                 </div>
             </div>
-            <DataTable data={data || []} columns={columns} searchKey="name" />
+            <DataTable data={pets || []} columns={columns} searchKey="name" />
         </div>
     )
 }

@@ -1,48 +1,44 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { PawPrint } from 'lucide-react';
+import axios from 'axios';
 
-interface PetFormData {
-    petName: string;
-    petSpecies: string;
-    petGender: string;
-    petBreed: string;
-    petAgeYears: string;
-    petAgeMonths: string;
-    petAgeDays: string;
-    petDOB: string;
+export interface PetFormData {
+    id?: string;
+    pet_name: string;
+    species: string;
+    gender: string;
+    breed: string;
+    date_of_birth: string;
     microchipNumber: string;
     vaccinationId: string;
     petColor: string;
     petWeight: string;
-    ownerName: string;
-    ownerEmail: string;
-    mobileNumber: string;
-    whatsappNumber: string;
-    ownerAddress: string;
-    petNotes: string;
+    owner_name: string;
+    owner_email: string;
+    owner_phone: string;
+    owner_address: string;
+    medical_notes: string;
+    created_at?: string;
 }
 
-export default function PetClinicForm({ initialData }: { initialData: PetFormData }) {
+export default function PetClinicForm() {
     const [formData, setFormData] = useState<PetFormData>({
-        petName: '',
-        petSpecies: '',
-        petGender: '',
-        petBreed: '',
-        petAgeYears: '',
-        petAgeMonths: '',
-        petAgeDays: '',
-        petDOB: '',
+        pet_name: '',
+        species: '',
+        gender: '',
+        breed: '',
+        date_of_birth: '',
         microchipNumber: '',
         vaccinationId: '',
         petColor: '',
         petWeight: '',
-        ownerName: '',
-        ownerEmail: '',
-        mobileNumber: '',
-        whatsappNumber: '',
-        ownerAddress: '',
-        petNotes: ''
+        owner_name: '',
+        owner_email: '',
+        owner_phone: '',
+        // whatsappNumber: '',
+        owner_address: '',
+        medical_notes: ''
     });
 
     useEffect(() => {
@@ -59,9 +55,24 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
         });
     };
 
-    const handleSubmit = () => {
-        console.log('Form submitted:', formData);
-        alert('Pet registration submitted successfully!');
+    const handleSubmit = async () => {
+        const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+        if (!token) {
+            throw new Error("No access token found");
+        }
+        try {
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/customers/`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            alert('Pet registration submitted successfully!');
+
+        } catch (error) {
+            console.log(error);
+
+        }
+
     };
 
     return (
@@ -94,8 +105,8 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                 </label>
                                 <input
                                     type="text"
-                                    name="petName"
-                                    value={formData.petName}
+                                    name="pet_name"
+                                    value={formData.pet_name}
                                     onChange={handleChange}
                                     required
                                     className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
@@ -107,18 +118,16 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                     Species *
                                 </label>
                                 <select
-                                    name="petSpecies"
-                                    value={formData.petSpecies}
+                                    name="species"
+                                    value={formData.species}
                                     onChange={handleChange}
                                     required
                                     className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
                                 >
                                     <option value="">Select Species</option>
-                                    <option value="Dog">Dog</option>
-                                    <option value="Cat">Cat</option>
-                                    <option value="Bird">Bird</option>
-                                    <option value="Rabbit">Rabbit</option>
-                                    <option value="Other">Other</option>
+                                    <option value="DOG">Dog</option>
+                                    <option value="CAT">Cat</option>
+
                                 </select>
                             </div>
 
@@ -127,15 +136,15 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                     Gender *
                                 </label>
                                 <select
-                                    name="petGender"
-                                    value={formData.petGender}
+                                    name="gender"
+                                    value={formData.gender}
                                     onChange={handleChange}
                                     required
                                     className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
                                 >
                                     <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                    <option value="MALE">Male</option>
+                                    <option value="FEMALE">Female</option>
                                 </select>
                             </div>
 
@@ -145,8 +154,8 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                 </label>
                                 <input
                                     type="text"
-                                    name="petBreed"
-                                    value={formData.petBreed}
+                                    name="breed"
+                                    value={formData.breed}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
                                 />
@@ -158,49 +167,14 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                 </label>
                                 <input
                                     type="date"
-                                    name="petDOB"
-                                    value={formData.petDOB}
+                                    name="date_of_birth"
+                                    value={formData.date_of_birth}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                                    Age
-                                </label>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <input
-                                        type="number"
-                                        name="petAgeYears"
-                                        value={formData.petAgeYears}
-                                        onChange={handleChange}
-                                        placeholder="Years"
-                                        min="0"
-                                        className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
-                                    />
-                                    <input
-                                        type="number"
-                                        name="petAgeMonths"
-                                        value={formData.petAgeMonths}
-                                        onChange={handleChange}
-                                        placeholder="Months"
-                                        min="0"
-                                        max="11"
-                                        className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
-                                    />
-                                    <input
-                                        type="number"
-                                        name="petAgeDays"
-                                        value={formData.petAgeDays}
-                                        onChange={handleChange}
-                                        placeholder="Days"
-                                        min="0"
-                                        max="30"
-                                        className="w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
-                                    />
-                                </div>
-                            </div>
+
 
                             <div>
                                 <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
@@ -271,8 +245,8 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                 </label>
                                 <input
                                     type="text"
-                                    name="ownerName"
-                                    value={formData.ownerName}
+                                    name="owner_name"
+                                    value={formData.owner_name}
                                     onChange={handleChange}
                                     required
                                     className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
@@ -285,8 +259,8 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                 </label>
                                 <input
                                     type="email"
-                                    name="ownerEmail"
-                                    value={formData.ownerEmail}
+                                    name="owner_email"
+                                    value={formData.owner_email}
                                     onChange={handleChange}
                                     required
                                     className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
@@ -299,34 +273,23 @@ export default function PetClinicForm({ initialData }: { initialData: PetFormDat
                                 </label>
                                 <input
                                     type="tel"
-                                    name="mobileNumber"
-                                    value={formData.mobileNumber}
+                                    name="owner_phone"
+                                    value={formData.owner_phone}
                                     onChange={handleChange}
                                     required
                                     className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                                    WhatsApp Number
-                                </label>
-                                <input
-                                    type="tel"
-                                    name="whatsappNumber"
-                                    value={formData.whatsappNumber}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-2 rounded-lg border bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
-                                />
-                            </div>
+
 
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                                     Address *
                                 </label>
                                 <textarea
-                                    name="ownerAddress"
-                                    value={formData.ownerAddress}
+                                    name="owner_address"
+                                    value={formData.owner_address}
                                     onChange={handleChange}
                                     required
                                     rows={3}

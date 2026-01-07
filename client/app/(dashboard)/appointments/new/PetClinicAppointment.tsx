@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, User, Stethoscope, PawPrint, FileText } from 'lucide-react';
+import axios from 'axios';
 
 interface User {
     id: string;
@@ -11,7 +12,7 @@ interface User {
 
 interface Pet {
     id: string;
-    name: string;
+    pet_name: string;
     species: string;
     breed: string;
     age: number;
@@ -25,46 +26,48 @@ interface Doctor {
 }
 
 interface AppointmentData {
-    userId: string;
-    petId: string;
-    doctorId: string;
-    date: string;
-    time: string;
+    pet: string;
     reason: string;
-    notes: string;
+    appointment_date?: string;
+    appointment_time?: string;
+    status: string;
 }
 
 const PetClinicAppointment: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
+    const [pets, setPets] = useState<Pet[]>([]);
 
-    // Mock data - in real app, fetch from API
-    const users: User[] = [
-        { id: '1', name: 'John Doe', email: 'john@example.com', phone: '+1234567890' },
-        { id: '2', name: 'Jane Smith', email: 'jane@example.com', phone: '+1234567891' }
-    ];
+    const fetchPets = async () => {
+        const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+        if (!token) {
+            throw new Error("No access token found");
+        }
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/customers/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setPets(data);
 
-    const pets: Pet[] = [
-        { id: '1', name: 'Max', species: 'Dog', breed: 'Golden Retriever', age: 3 },
-        { id: '2', name: 'Bella', species: 'Cat', breed: 'Persian', age: 2 },
-        { id: '3', name: 'Charlie', species: 'Dog', breed: 'Beagle', age: 5 }
-    ];
+        } catch (error) {
+            console.log(error);
 
-    const doctors: Doctor[] = [
-        { id: '1', name: 'Dr. Sarah Johnson', specialization: 'General Practice', available: true },
-        { id: '2', name: 'Dr. Michael Chen', specialization: 'Surgery', available: true },
-        { id: '3', name: 'Dr. Emily Brown', specialization: 'Dentistry', available: false }
-    ];
+        }
+    }
+    useEffect(() => {
+        fetchPets();
+    }, []);
+
 
     const [formData, setFormData] = useState<AppointmentData>({
-        userId: '',
-        petId: '',
-        doctorId: '',
-        date: '',
-        time: '',
+        pet: '',
+        appointment_date: '',
+        appointment_time: '',
         reason: '',
-        notes: ''
+        status: "SCHEDULED",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -79,44 +82,43 @@ const PetClinicAppointment: React.FC = () => {
         setLoading(true);
         setError('');
         setSuccess(false);
+        const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+        if (!token) {
+            throw new Error("No access token found");
+        }
 
         try {
-            // API call to book appointment
-            const response = await fetch('/api/appointments/book', {
-                method: 'POST',
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/appointments/`, formData, {
                 headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
+                    Authorization: `Bearer ${token}`
+                }
             });
+            // if (!response.ok) {
+            //     throw new Error('Failed to book appointment');
+            // }
 
-            if (!response.ok) {
-                throw new Error('Failed to book appointment');
-            }
-
-            const data = await response.json();
             console.log('Appointment booked:', data);
 
             setSuccess(true);
             setFormData({
-                userId: '',
-                petId: '',
-                doctorId: '',
-                date: '',
-                time: '',
+                pet: '',
                 reason: '',
-                notes: ''
+                appointment_date: '',
+                appointment_time: '',
+                status: "SCHEDULED",
             });
         } catch (err) {
+            console.log(error, "erorjhbjhghgf");
+
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setLoading(false);
         }
     };
 
-    const selectedUser = users.find(u => u.id === formData.userId);
-    const selectedPet = pets.find(p => p.id === formData.petId);
-    const selectedDoctor = doctors.find(d => d.id === formData.doctorId);
+    // const selectedUser = users.find(u => u.id === formData.userId);
+    const selectedPet = pets.find(p => p.id === formData.pet);
+    // const selectedDoctor = doctors.find(d => d.id === formData.doctorId);
 
     return (
         <div className="dark min-h-screen bg-gray-900 text-gray-100 p-4 md:p-8">
@@ -141,7 +143,7 @@ const PetClinicAppointment: React.FC = () => {
 
                     <div className="space-y-6">
                         {/* User Selection */}
-                        <div>
+                        {/* <div>
                             <label className="flex items-center gap-2 text-sm font-medium mb-2">
                                 <User className="w-4 h-4 text-blue-400" />
                                 Pet Owner
@@ -163,7 +165,7 @@ const PetClinicAppointment: React.FC = () => {
                             {selectedUser && (
                                 <p className="mt-2 text-sm text-gray-400">Phone: {selectedUser.phone}</p>
                             )}
-                        </div>
+                        </div> */}
 
                         {/* Pet Selection */}
                         <div>
@@ -172,8 +174,8 @@ const PetClinicAppointment: React.FC = () => {
                                 Pet
                             </label>
                             <select
-                                name="petId"
-                                value={formData.petId}
+                                name="pet"
+                                value={formData.pet}
                                 onChange={handleChange}
                                 required
                                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -181,7 +183,7 @@ const PetClinicAppointment: React.FC = () => {
                                 <option value="">Select pet</option>
                                 {pets.map(pet => (
                                     <option key={pet.id} value={pet.id}>
-                                        {pet.name} - {pet.species}
+                                        {pet.pet_name} - {pet.species}
                                     </option>
                                 ))}
                             </select>
@@ -193,7 +195,7 @@ const PetClinicAppointment: React.FC = () => {
                         </div>
 
                         {/* Doctor Selection */}
-                        <div>
+                        {/* <div>
                             <label className="flex items-center gap-2 text-sm font-medium mb-2">
                                 <Stethoscope className="w-4 h-4 text-blue-400" />
                                 Veterinarian
@@ -217,7 +219,7 @@ const PetClinicAppointment: React.FC = () => {
                                     Specialization: {selectedDoctor.specialization}
                                 </p>
                             )}
-                        </div>
+                        </div> */}
 
                         {/* Date and Time */}
                         <div className="grid md:grid-cols-2 gap-4">
@@ -228,8 +230,8 @@ const PetClinicAppointment: React.FC = () => {
                                 </label>
                                 <input
                                     type="date"
-                                    name="date"
-                                    value={formData.date}
+                                    name="appointment_date"
+                                    value={formData.appointment_date}
                                     onChange={handleChange}
                                     min={new Date().toISOString().split('T')[0]}
                                     required
@@ -243,9 +245,15 @@ const PetClinicAppointment: React.FC = () => {
                                 </label>
                                 <input
                                     type="time"
-                                    name="time"
-                                    value={formData.time}
-                                    onChange={handleChange}
+                                    name="appointment_time"
+                                    value={formData.appointment_time}
+                                    onChange={(e) => {
+                                        const time = e.target.value;
+                                        setFormData({
+                                            ...formData,
+                                            appointment_time: time
+                                        });
+                                    }}
                                     required
                                     className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
@@ -270,7 +278,7 @@ const PetClinicAppointment: React.FC = () => {
                         </div>
 
                         {/* Additional Notes */}
-                        <div>
+                        {/* <div>
                             <label className="text-sm font-medium mb-2 block">
                                 Additional Notes (Optional)
                             </label>
@@ -282,7 +290,7 @@ const PetClinicAppointment: React.FC = () => {
                                 placeholder="Any additional information about your pet's condition or special requirements"
                                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                             />
-                        </div>
+                        </div> */}
 
                         {/* Submit Button */}
                         <button

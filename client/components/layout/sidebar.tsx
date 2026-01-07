@@ -40,9 +40,9 @@ const routes = [
         color: "text-green-700",
     },
     {
-        label: "Pets",
+        label: "patient",
         icon: Dog,
-        href: "/pets",
+        href: "/patient",
         color: "text-pink-700",
     },
     {

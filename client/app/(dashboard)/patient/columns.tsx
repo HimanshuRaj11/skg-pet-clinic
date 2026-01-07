@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import moment from "moment"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,22 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { PetFormData } from "@/components/forms/PetClinicForm"
 
-export type Pet = {
-    id: string
-    ownerId: string
-    name: string
-    species: string
-    breed: string
-    dob: string
-    weight: number
-    gender: string
-    microchipId: string
-    photoUrl: string
-    notes: string
-}
 
-export const columns: ColumnDef<Pet>[] = [
+export const columns: ColumnDef<PetFormData>[] = [
     {
         accessorKey: "name",
         header: ({ column }) => {
@@ -37,7 +26,7 @@ export const columns: ColumnDef<Pet>[] = [
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    Name
+                    patients Name
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             )
@@ -46,13 +35,35 @@ export const columns: ColumnDef<Pet>[] = [
             return (
                 <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src={row.original.photoUrl} />
-                        <AvatarFallback>{row.original.name[0]}</AvatarFallback>
+                        {/* <AvatarImage src={row.original.photoUrl} /> */}
+                        <AvatarFallback>{row.original.pet_name[0]}</AvatarFallback>
                     </Avatar>
-                    <span>{row.original.name}</span>
+                    <span>{row.original.pet_name}</span>
                 </div>
             )
         }
+    },
+
+    {
+        accessorKey: "owner_name",
+        header: "Owner Name",
+    },
+    {
+        accessorKey: "created_at",
+        header: ({ column }) => {
+            return (
+                <span>Registration date</span>
+            )
+        },
+        cell: ({ row }) => {
+            const date = moment.utc(row.original.created_at!).local();
+            const formatted = date.format('DD-MMM-YYYY').toLowerCase();
+            return <span>{formatted}</span>
+        }
+    },
+    {
+        accessorKey: "gender",
+        header: "Gender",
     },
     {
         accessorKey: "species",
@@ -63,8 +74,8 @@ export const columns: ColumnDef<Pet>[] = [
         header: "Breed",
     },
     {
-        accessorKey: "gender",
-        header: "Gender",
+        accessorKey: "owner_phone",
+        header: "Mobile",
     },
     {
         id: "actions",
@@ -82,7 +93,7 @@ export const columns: ColumnDef<Pet>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(pet.id)}
+                            onClick={() => navigator.clipboard.writeText(pet.id!)}
                         >
                             Copy ID
                         </DropdownMenuItem>

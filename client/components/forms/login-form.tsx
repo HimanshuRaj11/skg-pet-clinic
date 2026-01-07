@@ -45,8 +45,9 @@ export function LoginForm() {
             const { data } = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/login/`, values)
 
             // Store the JWT tokens in cookies
-            document.cookie = `access_token=${data.access}; path=/; secure; samesite=strict`;
-            document.cookie = `refresh_token=${data.refresh}; path=/; secure; samesite=strict`;
+            const maxAge = 24 * 60 * 60; // 1 day in seconds
+            document.cookie = `access_token=${data.access}; path=/; secure; samesite=strict; max-age=${maxAge}`;
+            document.cookie = `refresh_token=${data.refresh}; path=/; secure; samesite=strict; max-age=${maxAge}`;
 
 
             // Set the default Authorization header for future axios calls
